@@ -12,6 +12,13 @@ router.get(
   userController.listUsers
 );
 
+router.put(
+  '/:id/status',
+  verifyToken,
+  authorizeRoles('superadmin'),
+  userController.changeStatus
+);
+
 router.post(
   '/',
   verifyToken,

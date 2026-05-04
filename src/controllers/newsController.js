@@ -86,6 +86,8 @@ const deleteNews = async (req, res) => {
   }
 };
 
+
+
 module.exports = {
   listNews,
   listPublicNews,

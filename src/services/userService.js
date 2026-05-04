@@ -40,7 +40,16 @@ const createUser = async (payload) => {
   });
 };
 
+const changeUserStatus = async (id, estado) => {
+  if (!['activo', 'inactivo'].includes(estado)) {
+    throw new Error('Estado inválido');
+  }
+
+  return await userRepository.updateUserStatus(id, estado);
+};
+
 module.exports = {
   getUsers,
   createUser,
+  changeUserStatus,
 };

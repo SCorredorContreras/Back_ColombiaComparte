@@ -41,6 +41,20 @@ const findUserByUsernameOrEmail = async (username, email) => {
   return data;
 };
 
+
+const updateUserStatus = async (id, estado) => {
+  const { data, error } = await supabase
+    .from('usuarios')
+    .update({ estado })
+    .eq('id', id)
+    .select('id, estado')
+    .single();
+
+  if (error) throw new Error(error.message);
+
+  return data;
+};
+
 const createUser = async (payload) => {
   const { data, error } = await supabase
     .from('usuarios')
@@ -65,4 +79,5 @@ module.exports = {
   findAllUsers,
   findUserByUsernameOrEmail,
   createUser,
+  updateUserStatus,
 };
