@@ -653,3 +653,34 @@ Body/ raw/ json:
 
 - Header:
 Authorization: Bearer TOKEN
+
+PARA TERMINAR EL BACKEND
+
+create table bitacora_auditoria (
+  id bigint generated always as identity primary key,
+  usuario_id bigint references usuarios(id),
+  accion text not null,
+  modulo text not null,
+  registro_id bigint,
+  descripcion text,
+  ip text,
+  created_at timestamptz default now()
+);
+
+
+Crear repository
+
+ - src/repositories/auditRepository.js
+
+import supabase from '../config/supabase.js';
+
+export const createLog = async (log) => {
+  const { data, error } = await supabase
+    .from('bitacora_auditoria')
+    .insert([log]);
+
+  if (error) throw error;
+  return data;
+};
+
+poner en la terminal npm install express-validator

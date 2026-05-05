@@ -24,7 +24,22 @@ const listActiveCountries = async (req, res) => {
   }
 };
 
+const getCountryBySlug = async (req, res) => {
+  try {
+    const { slug } = req.params;
+
+    const country = await countryService.getCountryBySlug(slug);
+
+    return res.json(country);
+  } catch (error) {
+    return res.status(404).json({
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   listCountries,
   listActiveCountries,
+  getCountryBySlug,
 };

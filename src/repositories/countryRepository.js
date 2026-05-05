@@ -23,7 +23,20 @@ const findActiveCountries = async () => {
   return data;
 };
 
+const findCountryBySlug = async (slug) => {
+  const { data, error } = await supabase
+    .from('paises')
+    .select('*')
+    .eq('slug', slug)
+    .single();
+
+  if (error) throw new Error(error.message);
+
+  return data;
+};
+
 module.exports = {
   findAllCountries,
   findActiveCountries,
+  findCountryBySlug,
 };
