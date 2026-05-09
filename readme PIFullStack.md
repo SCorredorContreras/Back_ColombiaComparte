@@ -684,3 +684,106 @@ export const createLog = async (log) => {
 };
 
 poner en la terminal npm install express-validator
+
+> Parte 17: Gestión de usuarios recuperación de contraseña (pregunta de seguridad)
+
+1. SQL editor (supabase)
+- Ejecutar en Supabase:
+
+alter table usuarios
+add column if not exists pregunta_seguridad text,
+add column if not exists respuesta_seguridad_hash text,
+add column if not exists password_updated_at timestamptz;
+
+2. Se actulizan los scripts afectados en orden:
+src/repositories/authRepository.js
+src/services/authService.js
+src/controllers/authController.js
+src/routes/authRoutes.js
+src/repositories/userRepository.js
+src/services/userService.js
+src/controllers/userController.js
+src/routes/userRoutes.js
+src/scripts/createSuperAdmin.js
+
+3. eliminamos el usuario admin y lo volvemos a crear bajo el script createSuperAdmin.js
+
+> Probar en Postman
+
+> [Olvidé mi contraseña]
+POST http://localhost:3001/api/auth/forgot-password
+{
+  "identifier": "superadmin"
+}
+
+- Respuesta:
+
+{
+  "message": "Pregunta de seguridad encontrada",
+  "username": "superadmin",
+  "pregunta_seguridad": "¿Cuál es el código inicial del sistema?"
+}
+
+
+Restaurar contraseña
+POST http://localhost:3001/api/auth/reset-password
+{
+  "username": "superadmin",
+  "respuesta_seguridad": "cms2026",
+  "nueva_password": "123456789"
+}
+
+> [Restaurar contraseña]
+
+- POST http://localhost:3001/api/auth/reset-password
+
+- body/raw/json
+{
+  "username": "superadmin",
+  "respuesta_seguridad": "cms2026",
+  "nueva_password": "123456789"
+}
+
+> [Cambiar contraseña propia]
+
+- Requiere token.
+
+- PUT http://localhost:3001/api/auth/change-password
+
+- Headers:
+  Authorization: Bearer TOKEN_USUARIO
+  
+- Content-Type: application/json
+  {
+    "password_actual": "123456789",
+    "nueva_password": "123456"
+  }
+
+> [Superadmin cambia contraseña de otro usuario]
+
+- PUT http://localhost:3001/api/users/2/password
+
+- Headers:
+Authorization: Bearer TOKEN_SUPERADMIN
+
+- Content-Type: application/json
+{
+  "nueva_password": "123456"
+}
+
+> [cambiar pregunta y respuesta de seguridad]
+
+- PATCH http://localhost:3001/api/auth/security-question
+
+- Headers:
+
+Authorization: Bearer TOKEN_USUARIO
+Content-Type: application/json
+
+- Body:
+
+{
+  "pregunta_seguridad": "¿Cuál es tu ciudad favorita?",
+  "respuesta_seguridad": "Tunja"
+}
+

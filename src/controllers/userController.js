@@ -57,8 +57,36 @@ const createUser = async (req, res, next) => {
   }
 };
 
+const changeUserPassword = async (req, res, next) => {
+  try {
+
+    const { id } = req.params;
+    const { nueva_password } = req.body;
+
+    const result = await userService.changeUserPassword(
+      id,
+      nueva_password
+    );
+
+    await logAction({
+      usuario_id: req.user.id,
+      accion: 'cambiar password usuario',
+      modulo: 'usuarios',
+      registro_id: id,
+      descripcion: 'Cambio de contraseña realizado',
+      ip: req.ip
+    });
+
+    return res.status(200).json(result);
+
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   listUsers,
   changeStatus,
   createUser,
+  changeUserPassword,
 };

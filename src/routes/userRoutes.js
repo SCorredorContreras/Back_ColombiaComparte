@@ -42,4 +42,16 @@ router.post(
   userController.createUser
 );
 
+router.put(
+  '/:id/password',
+  verifyToken,
+  authorizeRoles('superadmin'),
+  [
+    body('nueva_password')
+      .isLength({ min: 6 }),
+    validate
+  ],
+  userController.changeUserPassword
+);
+
 module.exports = router;

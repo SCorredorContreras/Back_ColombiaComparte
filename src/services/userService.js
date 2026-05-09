@@ -48,8 +48,29 @@ const changeUserStatus = async (id, estado) => {
   return await userRepository.updateUserStatus(id, estado);
 };
 
+const changeUserPassword = async (
+  userId,
+  nueva_password
+) => {
+
+  const password_hash = bcrypt.hashSync(
+    nueva_password,
+    10
+  );
+
+  await userRepository.updateUserPassword(
+    userId,
+    password_hash
+  );
+
+  return {
+    message: 'Contraseña actualizada correctamente'
+  };
+};
+
 module.exports = {
   getUsers,
   createUser,
   changeUserStatus,
+  changeUserPassword,
 };

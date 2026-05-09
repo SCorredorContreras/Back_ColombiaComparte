@@ -75,9 +75,28 @@ const createUser = async (payload) => {
   return data;
 };
 
+const updateUserPassword = async (
+  userId,
+  password_hash
+) => {
+
+  const { error } = await supabase
+    .from('usuarios')
+    .update({
+      password_hash,
+      password_updated_at: new Date().toISOString()
+    })
+    .eq('id', userId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+};
+
 module.exports = {
   findAllUsers,
   findUserByUsernameOrEmail,
   createUser,
   updateUserStatus,
+  updateUserPassword,
 };
