@@ -3,8 +3,9 @@ const supabase = require('../config/supabase');
 
 const createSuperAdmin = async () => {
   try {
+
     const username = 'superadmin';
-    const password = '123456'; // puedes cambiarlo
+    const password = '123456';
     const email = 'admin@cms.com';
 
     console.log('🔎 Verificando si ya existe el usuario...');
@@ -21,7 +22,14 @@ const createSuperAdmin = async () => {
     }
 
     console.log('🔐 Generando hash de contraseña...');
+
     const password_hash = bcrypt.hashSync(password, 10);
+
+    // NUEVO
+    const respuesta_seguridad_hash = bcrypt.hashSync(
+      'cms2026',
+      10
+    );
 
     console.log('🔎 Buscando rol superadmin...');
 
@@ -49,6 +57,12 @@ const createSuperAdmin = async () => {
           rol_id: role.id,
           pais_id: null,
           estado: 'activo',
+
+          // NUEVOS CAMPOS
+          pregunta_seguridad:
+            '¿Cuál es el código inicial del sistema?',
+
+          respuesta_seguridad_hash,
         },
       ]);
 
@@ -59,8 +73,11 @@ const createSuperAdmin = async () => {
     console.log('✅ Superadmin creado correctamente');
     console.log('👤 Usuario:', username);
     console.log('🔑 Password:', password);
+
   } catch (error) {
+
     console.error('❌ Error:', error.message);
+
   }
 };
 
