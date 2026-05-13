@@ -85,8 +85,24 @@ const changeSecurityQuestion = async (req, res, next) => {
   }
 };
 
+const register = async (req, res, next) => {
+
+  try {
+
+    const result =
+      await authService.register(req.body);
+
+    return res.status(201).json(result);
+
+  } catch (error) {
+
+    next(error);
+  }
+};
+
 module.exports = {
   login,
+  register,
   forgotPassword,
   resetPassword,
   changePassword,

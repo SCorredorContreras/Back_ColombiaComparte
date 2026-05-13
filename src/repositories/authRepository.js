@@ -126,11 +126,66 @@ const updateSecurityQuestion = async (
   }
 };
 
+const createUser = async (userData) => {
+
+  const { data, error } = await supabase
+    .from('usuarios')
+    .insert([userData])
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+};
+
+const findUserByUsernameAndCountry = async (
+  username,
+  pais_id
+) => {
+
+  const { data, error } = await supabase
+    .from('usuarios')
+    .select(`
+      id,
+      nombre,
+      apellido,
+      email,
+      username,
+      password_hash,
+      estado,
+      pais_id,
+      roles (
+        id,
+        nombre
+      ),
+      paises (
+        id,
+        nombre,
+        codigo,
+        slug
+      )
+    `)
+    .eq('username', username)
+    .eq('pais_id', pais_id)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+};
+
 module.exports = {
   findUserByUsername,
+  findUserByUsernameAndCountry,
   updateLastAccess,
   findUserByIdentifier,
   findUserById,
   updatePassword,
   updateSecurityQuestion,
+  createUser,
 };

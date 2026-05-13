@@ -2,22 +2,45 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const authRepository = require('../repositories/authRepository');
 
-const login = async ({ username, password }) => {
-  if (!username || !password) {
-    throw new Error('El usuario y la contraseña son obligatorios');
+const login = async ({
+  username,
+  password,
+  pais_id
+}) => {
+
+  if (
+    !username ||
+    !password ||
+    !pais_id
+  ) {
+    throw new Error(
+      'El usuario, la contraseña y el país son obligatorios'
+    );
   }
 
-  const user = await authRepository.findUserByUsername(username);
+  const user =
+    await authRepository.findUserByUsernameAndCountry(
+      username,
+      pais_id
+    );
 
   if (!user) {
-    throw new Error('Usuario no encontrado');
+    throw new Error(
+      'Usuario no encontrado para el país seleccionado'
+    );
   }
 
   if (user.estado !== 'activo') {
-    throw new Error('El usuario se encuentra inactivo');
+    throw new Error(
+      'El usuario se encuentra inactivo'
+    );
   }
 
-  const isValidPassword = await bcrypt.compare(password, user.password_hash);
+  const isValidPassword =
+    await bcrypt.compare(
+      password,
+      user.password_hash
+    );
 
   if (!isValidPassword) {
     throw new Error('Contraseña incorrecta');
@@ -26,6 +49,7 @@ const login = async ({ username, password }) => {
   await authRepository.updateLastAccess(user.id);
 
   const rol = user.roles?.nombre;
+
   const pais = user.paises || null;
 
   const token = jwt.sign(
@@ -54,7 +78,6 @@ const login = async ({ username, password }) => {
     },
   };
 };
-
 const forgotPassword = async ({ identifier }) => {
 
   if (!identifier) {
@@ -165,10 +188,76 @@ const changeSecurityQuestion = async (
   };
 };
 
+
+
+const register = async ({
+  nombre,
+  apellido,
+  email,
+  username,
+  password,
+  pais_id,
+  pregunta_seguridad,
+  respuesta_seguridad,
+}) => {
+
+ if (
+  !nombre ||
+  !apellido ||
+  !email ||
+  !username ||
+  !password ||
+  !pais_id ||
+  !pregunta_seguridad ||
+  !respuesta_seguridad
+) {
+    throw new Error(
+      'Todos los campos son obligatorios'
+    );
+  }
+
+  const existingUser =
+    await authRepository.findUserByIdentifier(
+      username
+    );
+
+  if (existingUser) {
+    throw new Error(
+      'El usuario ya existe'
+    );
+  }
+
+  const password_hash =
+    bcrypt.hashSync(password, 10);
+
+    const respuesta_seguridad_hash =
+  bcrypt.hashSync(respuesta_seguridad, 10);
+
+  const newUser =
+  await authRepository.createUser({
+    nombre,
+    apellido,
+    email,
+    username,
+    password_hash,
+    pais_id,
+    pregunta_seguridad,
+    respuesta_seguridad_hash,
+    rol_id: 3,
+    estado: "activo",
+  });
+
+  return {
+    message: 'Usuario registrado correctamente',
+    user: newUser,
+  };
+};
+
 module.exports = {
   login,
+  register,
   forgotPassword,
   resetPassword,
   changePassword,
   changeSecurityQuestion,
-};
+};  
